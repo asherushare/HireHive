@@ -17,8 +17,8 @@ const JobCard = ({job}) => {
       ></p>
 
       <div className='mt-4 flex gap-4 text-sm'>
-        <button>Apply Now</button>
-        <button>Learn more</button>
+        <button className='border bg-blue-600 p-2 text-white rounded'>Apply Now</button>
+        <button className='border rounded p-2'>Learn more</button>
       </div>
     </div>
   );

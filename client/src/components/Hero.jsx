@@ -44,11 +44,11 @@ const Hero = () => {
               ref={locationRef}
             />
           </div>
-          <button onClick={onSearch} className='bg-blue-600 px-6 py-2 rounded text-white m-1'>Search</button>
+          <button onClick={onSearch} className='bg-blue-600 px-6 py-2 rounded text-white m-1 cursor-pointer'>Search</button>
         </div>
       </div>
 
-      <div className='border border-gray-300 shadow-md mx-2 p-6 rounded-md flex'>
+      <div className='border border-gray-300 shadow-md mx-2 p-6 rounded-md flex mt-5'>
         <div className='flex justify-center gap-10 lg:gap-16 flex-wrap'>
           <p className='font-medium'>Trusted by</p>
           <img className='h-6' src={assets.microsoft_logo} alt="" />
