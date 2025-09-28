@@ -1,7 +1,11 @@
 import React from 'react'
 import { assets } from '../assets/assets'
+import { useNavigate } from 'react-router-dom';
 
 const JobCard = ({job}) => {
+
+  const navigate = useNavigate();
+
   return (
     <div className='border p-6 shadow rounded'>
       <div className='flex justify-between items-center'>
@@ -17,8 +21,8 @@ const JobCard = ({job}) => {
       ></p>
 
       <div className='mt-4 flex gap-4 text-sm'>
-        <button className='border bg-blue-600 px-4 py-2 text-white rounded'>Apply Now</button>
-        <button className='border rounded border-gray-500 text-gray-500 px-4 py-2'>Learn more</button>
+        <button onClick={() => {navigate(`/apply-job/${job.id}`); scrollTo(0, 0)}} className='border bg-blue-600 px-4 py-2 text-white rounded'>Apply Now</button>
+        <button onClick={() => {navigate(`/apply-job/${job.id}`); scrollTo(0, 0)}} className='border rounded border-gray-500 text-gray-500 px-4 py-2'>Learn more</button>
       </div>
     </div>
   );
