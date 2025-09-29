@@ -7,8 +7,8 @@ import connectDB from './config/db.js';
 //initialize Express
 const app = express();
 
-//Connect to database
-//await connectDB();   // commented out to avoid warning in terminal, when we'll  mongo uri then uncomment this line.
+// Connect to database
+await connectDB();
 
 //Middlewares
 app.use(cors());
