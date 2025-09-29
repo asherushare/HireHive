@@ -1,13 +1,15 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const Navbar = () => {
 
     const {openSignIn} = useClerk()
     const {user} = useUser()
+
+    
 
   return (
     <div className="shadow py-4">
