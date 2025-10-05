@@ -77,13 +77,15 @@ const ApplyJob = () => {
               <button className="bg-blue-600 p-2.5 px-10 text-white rounded mt-10">Apply Now</button>
             </div>
 
+
               {/* RIGHT SECTION JOB DESC */}
-            <div>
-                <h2>More Jobs from {jobData.companyId.name}</h2>
+            {/*<div>
+                //<h2>More Jobs from {jobData.companyId.name}</h2>
                 {jobs.filter( job => job._id !== jobData._id && <job className="companyId _id"></job> === jobData.companyId._id)
                 .filter( job => true).slice(0,4)
                 .map((job, index) => <JobCard key = {index} job={job}/>)}
             </div>
+            */}
 
           </div>
 
