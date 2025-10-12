@@ -10,6 +10,9 @@ const app = express();
 // Connect to database
 await connectDB();
 
+
+
+
 //Middlewares
 app.use(cors());
 app.use(express.json());
@@ -24,4 +27,9 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 })
 
+// Patra Krisani 
+
 // testing comment
+// Testing a comment
+// last testing
+// testing
