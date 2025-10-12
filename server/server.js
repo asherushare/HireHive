@@ -14,6 +14,7 @@ const app = express();
 // Connect to database
 await connectDB();
 
+
 //Middlewares
 app.use(cors());
 app.use(express.json());
