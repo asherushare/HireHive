@@ -1,19 +1,17 @@
 // Import with `import * as Sentry from "@sentry/node"` if you are using ESM
-import * as Sentry from "@sentry/node";
-// const Sentry = require("@sentry/node");
+import * as Sentry from "@sentry/node"
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 Sentry.init({
   dsn: "https://6ef93b519f17d0d55171c61b9706b00b@o4510081289289728.ingest.us.sentry.io/4510081297088512",
   integrations: [
     nodeProfilingIntegration(),
-    Sentry.mongoIntegration()
   ],
 
   // Send structured logs to Sentry
   enableLogs: true,
   // Tracing
-  // tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set sampling rate for profiling - this is evaluated only once per SDK.init call
   profileSessionSampleRate: 1.0,
   // Trace lifecycle automatically enables profiling during active traces

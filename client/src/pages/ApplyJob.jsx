@@ -82,14 +82,12 @@ const ApplyJob = () => {
 
 
               {/* RIGHT SECTION JOB DESC */}
-            {/*<div>
-                //<h2>More Jobs from {jobData.companyId.name}</h2>
-                {jobs.filter( job => job._id !== jobData._id && <job className="companyId _id"></job> === jobData.companyId._id)
-                .filter( job => true).slice(0,4)
+            <div className='w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5'>
+                <h2>More Jobs from {JobData.companyId.name}</h2>
+                {jobs.filter( job => job._id !== JobData._id && job.companyId._id === JobData.companyId._id) 
+                /*.filter(job => true)*/.slice(0,4)
                 .map((job, index) => <JobCard key = {index} job={job}/>)}
             </div>
-            */}
-
           </div>
 
         </div>
