@@ -1,5 +1,10 @@
 import { createContext, useEffect, useState } from "react";
 import { jobsData } from "../assets/assets";
+import axios from 'axios';
+// import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
+
+import "react-toastify/dist/ReactToastify.css";
 
 export const AppContext = createContext();
 
@@ -23,12 +28,67 @@ export const AppContextProvider = (props) => {
 
     // Function to fetch jobs
     const fetchJobs = async () => {
-        setJobs(jobsData);
+        try{
+
+            const {data} = await axios.get(backendUrl+'/api/jobs')
+
+            if(data.success){
+                setJobs(data.jobs)
+                console.log(data.jobs);
+            } else{
+                toast.error(data.message)
+            }
+
+        } catch(error) {
+            toast.error(error.message)
+        }
+       
+    }
+
+    // Function to fetch company data
+
+    const fetchCompanyData = async() => {
+        try{
+            const {data} = await axios.get(backendUrl+'/api/company/company', {headers: 
+                {token: companyToken}
+            })
+
+            if(data.success) {
+                setCompanyData(data.company)
+            } else{
+                toast.error(data.message)
+            }
+        } catch(error){
+            toast.error(error.message)
+        }
     }
 
     useEffect(() => {
+        fetchJobs()
+        const storedCompanyToken = localStorage.getItem('companyToken')
+
+        if(storedCompanyToken) {
+            setCompanyToken(storedCompanyToken)
+        }
+    }, [])
+
+    useEffect(() => {
         fetchJobs();
+
+        const storedCompanyToken = localStorage.getItem('companyToken')
+
+        if(storedCompanyToken){
+            setCompanyToken(storedCompanyToken)
+        }
+
     }, []);
+
+    useEffect(() => {
+        if(companyToken){
+            fetchCompanyData()
+        }
+
+    }, [companyToken])
 
     const value = {
         searchFilter,
