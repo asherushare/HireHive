@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import ApplyJob from './pages/ApplyJob'
-import Application from './pages/Application'
 import { AppContext } from './context/AppContext'
 import RecruiterLogin from './components/RecruiterLogin';
 import Dashboard from './pages/Dashboard'
@@ -13,6 +12,7 @@ import 'quill/dist/quill.snow.css'
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Applications from './pages/Application'
 
 
 const App = () => {
@@ -26,7 +26,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/apply-job/:id" element={<ApplyJob />} />
-        <Route path="/applications" element={<Application />} />
+        <Route path="/applications" element={<Applications />} />
         <Route path="/dashboard" element={<Dashboard />}>
         {companyToken ? <>
         <Route path = 'add-job' element = {<AddJob />} />
