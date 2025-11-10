@@ -66,7 +66,7 @@ const RecruiterLogin = () => {
 
 
         } catch(error){
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error.message || 'Operation failed')
         }
         
 

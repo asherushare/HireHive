@@ -28,12 +28,10 @@ const App = () => {
         <Route path="/apply-job/:id" element={<ApplyJob />} />
         <Route path="/applications" element={<Applications />} />
         <Route path="/dashboard" element={<Dashboard />}>
-        {companyToken ? <>
-        <Route path = 'add-job' element = {<AddJob />} />
-          <Route path = 'manage-jobs' element = {<ManageJobs />} />
-          <Route path = 'view-applications' element = {<ViewApplications />} />
-        </>: null}
-          
+          <Route index element={<ManageJobs />} />
+          <Route path="add-job" element={<AddJob />} />
+          <Route path="manage-jobs" element={<ManageJobs />} />
+          <Route path="view-applications" element={<ViewApplications />} />
         </Route>
       </Routes>
     </div>

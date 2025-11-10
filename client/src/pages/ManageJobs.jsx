@@ -24,13 +24,12 @@ const ManageJobs = () => {
             )
             if(data.success) {
                 setJobs(data.jobsData.reverse())
-                console.log(data.jobsData)
             }
             else {
                 toast.error(data.message)
             }
-        } catch {
-
+        } catch(error) {
+            toast.error(error?.response?.data?.message || error.message || 'Failed to fetch jobs')
         }
     }
 
@@ -53,7 +52,7 @@ const ManageJobs = () => {
             
 
         } catch(error){
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error.message || 'Failed to update job visibility')
         }
     }
 

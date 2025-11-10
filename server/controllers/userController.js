@@ -34,6 +34,9 @@ export const applyForJob = async(req, res) => {
     const userId = req.auth.userId
 
     try{
+        if(!jobId){
+            return res.json({success: false, message: 'Job ID is required'})
+        }
 
         const isAlreadyApplied = await JobApplication.find({jobId, userId})
 
@@ -95,12 +98,18 @@ export const updateUserResume = async (req, res) => {
 
         const resumeFile = req.file
 
+        if(!resumeFile){
+            return res.json({success: false, message: 'Resume file is required'})
+        }
+
         const userData = await User.findById(userId)
 
-        if(resumeFile){
-            const resumeUpload = await cloudinary.uploader.upload(resumeFile.path)
-            userData.resume = resumeUpload.secure_url
+        if(!userData){
+            return res.json({success: false, message: 'User not found'})
         }
+
+        const resumeUpload = await cloudinary.uploader.upload(resumeFile.path)
+        userData.resume = resumeUpload.secure_url
 
         await userData.save()
 

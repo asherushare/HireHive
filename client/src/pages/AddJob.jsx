@@ -23,6 +23,12 @@ const AddJob = () => {
 
         try {
             const description = quillRef.current.root.innerHTML
+            
+            if(!title || !description || description === '<p><br></p>' || salary < 0) {
+                toast.error('Please fill in all required fields with valid data')
+                return
+            }
+            
             const {data} = await axios.post(backendUrl+'/api/company/post-job', {
                 title, description, location, salary, category, level
             },
@@ -30,7 +36,7 @@ const AddJob = () => {
         )
 
         if(data.success) {
-            toast.success(data.message)
+            toast.success('Job posted successfully!')
             setTitle('')
             setSalary(0)
             quillRef.current.root.innerHTML = ""
@@ -38,7 +44,7 @@ const AddJob = () => {
             toast.error(data.message)
         }
         } catch(error) {
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error.message || 'Failed to post job')
         }
     }
 

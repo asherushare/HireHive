@@ -86,7 +86,7 @@ const ViewApplications = () => {
             .filter((item) => item.jobId && item.userId)
             .map((applicant, index) => (
               <tr
-                key={index}
+                key={applicant._id || index}
                 className="text-gray-700 border-t border-gray-200"
               >
                 <td className="py-2 px-4 text-center">{index + 1}</td>
@@ -94,28 +94,32 @@ const ViewApplications = () => {
                 <td className="py-2 px-4 flex items-center gap-3">
                   <img
                     className="w-10 h-10 rounded-full max-sm:hidden"
-                    src={applicant.userId.image}
+                    src={applicant.userId?.image || ''}
                     alt=""
                   />
-                  <span>{applicant.userId.name}</span>
+                  <span>{applicant.userId?.name || 'Unknown User'}</span>
                 </td>
 
                 <td className="py-2 px-4 max-sm:hidden">
-                  {applicant.jobId.location}
+                  {applicant.jobId?.location || 'N/A'}
                 </td>
                 <td className="py-2 px-4 max-sm:hidden">
-                  {applicant.jobId.title}
+                  {applicant.jobId?.title || 'N/A'}
                 </td>
 
                 <td className="py-2 px-4">
-                  <a
-                    href={applicant.userId.resume}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="bg-blue-50 text-blue-500 px-3 py-1 rounded inline-flex gap-2 items-center hover:bg-blue-100"
-                  >
-                    Resume <img src={assets.resume_download_icon} alt="" />
-                  </a>
+                  {applicant.userId?.resume ? (
+                    <a
+                      href={applicant.userId.resume}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="bg-blue-50 text-blue-500 px-3 py-1 rounded inline-flex gap-2 items-center hover:bg-blue-100"
+                    >
+                      Resume <img src={assets.resume_download_icon} alt="" />
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">No resume</span>
+                  )}
                 </td>
 
                 <td className="py-2 px-4">

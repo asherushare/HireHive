@@ -12,7 +12,7 @@ export const getJobs = async (req, res) =>{
         res.json({success: true, jobs})
 
     } catch(error){
-        res.json({success: false, message: error.massage})
+        res.json({success: false, message: error.message})
     }
 }
 

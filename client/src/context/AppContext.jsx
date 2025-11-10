@@ -1,10 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import axios from 'axios';
-// import { toast } from 'react-toastify';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import "react-toastify/dist/ReactToastify.css";
-import { data } from "react-router-dom";
 import { useAuth, useUser } from "@clerk/clerk-react";
 
 export const AppContext = createContext();
@@ -41,13 +39,12 @@ export const AppContextProvider = (props) => {
 
             if(data.success){
                 setJobs(data.jobs)
-                console.log(data.jobs);
             } else{
                 toast.error(data.message)
             }
 
         } catch(error) {
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error.message || 'Failed to fetch jobs')
         }
        
     }
@@ -66,7 +63,7 @@ export const AppContextProvider = (props) => {
                 toast.error(data.message)
             }
         } catch(error){
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error.message || 'Failed to fetch company data')
         }
     }
 
@@ -85,7 +82,7 @@ export const AppContextProvider = (props) => {
                 toast.error(data.message)
             }
         } catch(error) {
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error.message || 'Failed to fetch user data')
         }
     }
 
@@ -105,28 +102,17 @@ export const AppContextProvider = (props) => {
                 toast.error(data.message)
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error.message || 'Failed to fetch applications')
         }
     }
 
     useEffect(() => {
-        fetchJobs()
-        const storedCompanyToken = localStorage.getItem('companyToken')
+        fetchJobs();
+        const storedCompanyToken = localStorage.getItem('companyToken');
 
         if(storedCompanyToken) {
-            setCompanyToken(storedCompanyToken)
+            setCompanyToken(storedCompanyToken);
         }
-    }, [])
-
-    useEffect(() => {
-        fetchJobs();
-
-        const storedCompanyToken = localStorage.getItem('companyToken')
-
-        if(storedCompanyToken){
-            setCompanyToken(storedCompanyToken)
-        }
-
     }, []);
 
     useEffect(() => {

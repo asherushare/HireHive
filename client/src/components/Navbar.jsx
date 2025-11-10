@@ -58,7 +58,7 @@ import { AppContext } from "../context/AppContext";
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
-  const { setShowRecruiterLogin } = useContext(AppContext);
+  const { setShowRecruiterLogin, companyToken, companyData } = useContext(AppContext);
 
   return (
     <div className="shadow py-4">
@@ -71,7 +71,21 @@ const Navbar = () => {
           </h1>
         </Link>
 
-        {user ? (
+        {companyToken && companyData ? (
+          // Recruiter is logged in - show dashboard link
+          <div className="flex items-center gap-3">
+            <Link
+              to="/dashboard/manage-jobs"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            >
+              Go to Dashboard
+            </Link>
+            <p className="max-sm:hidden text-gray-600">
+              {companyData.name}
+            </p>
+          </div>
+        ) : user ? (
+          // Regular user is logged in
           <div className="flex items-center gap-3">
             <Link
               to="/applications"
@@ -86,6 +100,7 @@ const Navbar = () => {
             <UserButton />
           </div>
         ) : (
+          // Not logged in
           <div className="flex gap-4 max-sm:text-xs">
             <button
               onClick={() => setShowRecruiterLogin(true)}

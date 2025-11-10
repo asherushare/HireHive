@@ -1,11 +1,12 @@
 import React, { useContext, useEffect } from "react";
-import { NavLink, Outlet, useNavigate, Link } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { companyData, setCompanyData, setCompanyToken } =
+  const location = useLocation();
+  const { companyData, setCompanyData, setCompanyToken, companyToken } =
     useContext(AppContext);
 
   const logout = () => {
@@ -16,17 +17,23 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (companyData) {
-      navigate("/dashboard/manage-jobs");
+    if (!companyToken && !companyData) {
+      navigate("/");
+      return;
     }
-  }, [companyData]);
+    
+    // If on /dashboard exactly, redirect to manage-jobs
+    if (location.pathname === "/dashboard") {
+      navigate("/dashboard/manage-jobs", { replace: true });
+    }
+  }, [companyData, companyToken, navigate, location.pathname]);
 
   return (
     <div>
       {/* Navbar for recruiter panel */}
       <div className="shadow py-4">
         <div className="px-5 flex justify-between items-center">
-          {/* ✅ Clickable Logo */}
+          {/* ✅ Clickable Logo - Goes to Public Landing Page so Recruiters can verify their jobs */}
           <Link to="/">
             <h1 className="text-xl font-bold cursor-pointer">
               <span className="text-blue-800">H</span>ire
@@ -34,7 +41,7 @@ const Dashboard = () => {
             </h1>
           </Link>
 
-          {companyData && (
+          {companyData ? (
             <div className="flex items-center gap-3">
               <p className="max-sm:hidden">Welcome, {companyData.name}</p>
               <div className="relative group">
@@ -52,6 +59,10 @@ const Dashboard = () => {
                   </ul>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <p className="text-gray-500">Loading...</p>
             </div>
           )}
         </div>
