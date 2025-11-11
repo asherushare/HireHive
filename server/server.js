@@ -15,27 +15,71 @@ import {clerkMiddleware} from '@clerk/express'
 //initialize Express
 const app = express();
 
-// Connect to database
+// Connect to database and services
+console.log('🚀 Starting server...');
+console.log('📦 Environment:', process.env.NODE_ENV || 'development');
+
 await connectDB();
-await connectCloudinary()
+await connectCloudinary();
+
+console.log('✅ All services connected');
 
 
 
 //Middlewares
-app.use(cors());
-app.use(express.json());
-app.use(clerkMiddleware())
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*', // Allow requests from frontend
+  credentials: true
+}));
+app.use(express.json({ limit: '10mb' })); // Increase limit for file uploads
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-//Routes
+// Public routes (no authentication required)
 app.get('/', (req, res) => res.send('API is running...'));
 app.get("debug-sentry", function mainHandler(req, res) {
     throw new Error("My first Sentry error!");
 });
 
+// Diagnostic endpoint to check configuration
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        services: {
+            mongodb: process.env.MONGODB_URI ? 'configured' : 'missing',
+            cloudinary: (process.env.CLOUDINARY_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_SECRET_KEY) ? 'configured' : 'missing',
+            clerk: process.env.CLERK_SECRET_KEY ? 'configured' : 'missing',
+            webhook: process.env.CLERK_WEBHOOK_SECRET ? 'configured' : 'missing'
+        },
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// Webhook route - MUST be before clerkMiddleware
+// Webhooks have their own authentication via CLERK_WEBHOOK_SECRET
 app.post('/webhooks', clerkWebhooks);
-app.use('/api/company', companyRoutes)
+
+// Public API routes (no authentication required)
+// Jobs should be publicly accessible
 app.use('/api/jobs', jobRoutes)
+// Company registration and login are public
+app.use('/api/company', companyRoutes)
+
+// Clerk middleware - requires CLERK_SECRET_KEY environment variable
+// This validates JWT tokens from Clerk for all routes below
+if (!process.env.CLERK_SECRET_KEY) {
+  console.warn('⚠️  WARNING: CLERK_SECRET_KEY is not set. User authentication will fail!');
+} else {
+  console.log('✅ Clerk middleware configured');
+}
+app.use(clerkMiddleware({
+  secretKey: process.env.CLERK_SECRET_KEY
+}));
+
+// Protected API routes (require Clerk authentication)
+// User routes require authentication
 app.use('/api/users', userRoutes)
+// Some company routes are protected (already handled by protectCompany middleware in routes)
 
 
 

@@ -72,6 +72,11 @@ export const AppContextProvider = (props) => {
         try {
             const token = await getToken();
 
+            if (!token) {
+                console.log('No token available');
+                return;
+            }
+
             const {data} = await axios.get(backendUrl+'/api/users/user', {headers:
                 {Authorization: `Bearer ${token}`}
             })
@@ -79,10 +84,22 @@ export const AppContextProvider = (props) => {
             if(data.success) {
                 setUserData(data.user)
             }else {
-                toast.error(data.message)
+                // User not found - likely webhook issue
+                if (data.message && data.message.includes('User Not Found')) {
+                    console.error('User not found in database. This may be a webhook configuration issue.');
+                    // Don't show error toast, just log it - user might have just registered
+                } else {
+                    toast.error(data.message);
+                }
+                setUserData(null);
             }
         } catch(error) {
-            toast.error(error?.response?.data?.message || error.message || 'Failed to fetch user data')
+            console.error('Error fetching user data:', error);
+            // Don't show error if it's a 401 (not authenticated) - that's expected for logged out users
+            if (error?.response?.status !== 401) {
+                toast.error(error?.response?.data?.message || error.message || 'Failed to fetch user data');
+            }
+            setUserData(null);
         }
     }
 

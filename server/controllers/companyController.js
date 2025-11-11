@@ -23,16 +23,30 @@ export const registerCompany = async (req, res) => {
             return res.json({success:false, message: 'Company already registered'})
         }
 
+        if (!process.env.CLOUDINARY_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_SECRET_KEY) {
+            return res.status(500).json({
+                success: false,
+                message: 'File upload service is not configured. Please contact support.'
+            });
+        }
+
         const salt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(password, salt)
 
-        const imageUpload = await cloudinary.uploader.upload(imageFile.path)
+        // Upload to Cloudinary using buffer (memory storage)
+        const base64Data = imageFile.buffer.toString('base64');
+        const dataURI = `data:${imageFile.mimetype};base64,${base64Data}`;
+        
+        const uploadResult = await cloudinary.uploader.upload(dataURI, {
+            resource_type: 'auto',
+            folder: 'companies'
+        });
         
         const company = await Company.create ({
             name,
             email,
             password: hashPassword,
-            image: imageUpload.secure_url
+            image: uploadResult.secure_url
         })
         res.json({
             success: true,
@@ -46,7 +60,11 @@ export const registerCompany = async (req, res) => {
          })
         
     } catch(error){
-        res.json({success: false, message: error.message})
+        console.error('Error in registerCompany:', error);
+        res.status(500).json({
+            success: false, 
+            message: error.message || 'Failed to register company. Please try again.'
+        });
     }
 }
 

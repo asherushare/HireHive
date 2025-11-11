@@ -49,15 +49,26 @@ const ApplyJob = () => {
 
   const applyHander = async () => {
     try {
-      if (!userData) {
+      // Check if user is authenticated with Clerk
+      const token = await getToken();
+
+      if (!token) {
         return toast.error("Please login to apply for jobs");
       }
+
+      // Try to fetch user data if not available
+      if (!userData) {
+        // User might be logged in with Clerk but not in database (webhook issue)
+        toast.error(
+          "User account not found. Please contact support or try registering again."
+        );
+        return;
+      }
+
       if (!userData.resume) {
         navigate("/applications");
         return toast.error("Please upload your resume to apply for jobs");
       }
-
-      const token = await getToken();
 
       const { data } = await axios.post(
         backendUrl + "/api/users/apply",
@@ -72,15 +83,29 @@ const ApplyJob = () => {
       if (data.success) {
         toast.success(data.message);
         fetchUserApplications();
+        setIsAlreadyApplied(true);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(
+      const errorMessage =
         error?.response?.data?.message ||
-          error.message ||
-          "Failed to apply for job"
-      );
+        error.message ||
+        "Failed to apply for job";
+
+      // Check if it's a user not found error
+      if (
+        errorMessage.includes("User not found") ||
+        errorMessage.includes("complete your registration")
+      ) {
+        toast.error(
+          "Your account is not set up. Please contact support or try registering again."
+        );
+      } else if (error?.response?.status === 401) {
+        toast.error("Please login to apply for jobs");
+      } else {
+        toast.error(errorMessage);
+      }
     }
   };
 
