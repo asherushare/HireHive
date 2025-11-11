@@ -1,56 +1,45 @@
-// import React, { useContext } from 'react'
+// import { useContext } from 'react'
 // import { assets } from '../assets/assets'
 // import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
-// import { Link, useNavigate } from "react-router-dom";
-// import { AppContext } from '../context/AppContext'; // Adjust the path if needed
-
+// import { Link, useNavigate } from 'react-router-dom'
+// import { AppContext } from '../context/AppContext'
 
 // const Navbar = () => {
 
-//     const {openSignIn} = useClerk()
-//     const {user} = useUser()
+//     const { openSignIn } = useClerk()
+//     const { user } = useUser()
 
 //     const navigate = useNavigate()
 
-//     const { setShowRecruiterLogin } = useContext(AppContext);
+//     const { setShowRecruiterLogin } = useContext(AppContext)
 
-    
+//     return (
+//         <div className='shadow py-4'>
+//             <div className='container px-4 2xl:px-20 mx-auto flex justify-between items-center'>
+//                 <img onClick={() => navigate('/')} className='cursor-pointer' src={assets.logo} alt="" />
+//                 {
+//                     user
+//                         ? <div className='flex items-center gap-3'>
+//                             <Link to={'/applications'}>Applied Jobs</Link>
+//                             <p>|</p>
+//                             <p className='max-sm:hidden'>Hi, {user.firstName + " " + user.lastName}</p>
+//                             <UserButton />
+//                         </div>
+//                         : <div className='flex gap-4 max-sm:text-xs'>
+//                             <button onClick={e => setShowRecruiterLogin(true)} className='text-gray-600'>Recruiter Login</button>
+//                             <button onClick={e => openSignIn()} className='bg-blue-600 text-white px-6 sm:px-9 py-2 rounded-full'>Login</button>
+//                         </div>
+//                 }
 
-//   return (
-//     <div className="shadow py-4">
-//       <div className="container px-4 2xl:px-20 mx-auto flex justify-between items-center">
-//         {/* <img src={assets.logo} alt="" /> */}
-//         <h1 className='text-xl font-bold'><span className='text-blue-800'>H</span>ire<span className='text-blue-800'>H</span>ive</h1>
-//         {user ? (
-//           <div className='flex items-center gap-3'>
-//             <Link to={'/applications'}>Applied Jobs</Link>
-//             <p>|</p>
-//             <p className='max-sm:hidden'>Hi, {user.firstName+" "+user.lastName}</p>
-//             <UserButton />
-//           </div>
-//         ) : (
-//           <div className="flex gap-4 max-sm:text-xs">
-//             <button onClick={e=> setShowRecruiterLogin(true)} className="text-gray-600">Recruiter Login</button>
-//             <button
-//               onClick={(e) => openSignIn()}
-//               className="bg-blue-600 text-white px-6 sm:px-9 py-2 rounded-full"
-//             >
-//               Login
-//             </button>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
+//             </div>
+//         </div>
+//     )
 // }
 
 // export default Navbar
 
 
-
-
-import React, { useContext } from "react";
-import { assets } from "../assets/assets";
+import { useContext } from "react";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
@@ -58,41 +47,26 @@ import { AppContext } from "../context/AppContext";
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
-  const { setShowRecruiterLogin, companyToken, companyData } = useContext(AppContext);
+
+  const navigate = useNavigate();
+
+  const { setShowRecruiterLogin } = useContext(AppContext);
 
   return (
-    <div className="shadow py-4">
+    <div className="shadow py-4 sticky top-0 bg-white z-50">
       <div className="container px-4 2xl:px-20 mx-auto flex justify-between items-center">
-        {/* ✅ Logo now redirects to Home */}
-        <Link to="/">
-          <h1 className="text-xl font-bold cursor-pointer">
-            <span className="text-blue-800">H</span>ire
-            <span className="text-blue-800">H</span>ive
-          </h1>
-        </Link>
+        {/* HiveHive logo with colored H letters */}
+        <h1
+          onClick={() => navigate("/")}
+          className="cursor-pointer text-2xl font-bold tracking-wide select-none"
+        >
+          <span className="text-blue-600">H</span>ive
+          <span className="text-blue-600">H</span>ive
+        </h1>
 
-        {companyToken && companyData ? (
-          // Recruiter is logged in - show dashboard link
+        {user ? (
           <div className="flex items-center gap-3">
-            <Link
-              to="/dashboard/manage-jobs"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-            >
-              Go to Dashboard
-            </Link>
-            <p className="max-sm:hidden text-gray-600">
-              {companyData.name}
-            </p>
-          </div>
-        ) : user ? (
-          // Regular user is logged in
-          <div className="flex items-center gap-3">
-            <Link
-              to="/applications"
-              className="hover:text-blue-700 cursor-pointer"
-            >
-              Applied Jobs
-            </Link>
+            <Link to={"/applications"}>Applied Jobs</Link>
             <p>|</p>
             <p className="max-sm:hidden">
               Hi, {user.firstName + " " + user.lastName}
@@ -100,18 +74,16 @@ const Navbar = () => {
             <UserButton />
           </div>
         ) : (
-          // Not logged in
           <div className="flex gap-4 max-sm:text-xs">
             <button
-              onClick={() => setShowRecruiterLogin(true)}
-              className="text-gray-600 hover:text-gray-800"
+              onClick={(e) => setShowRecruiterLogin(true)}
+              className="text-gray-600"
             >
               Recruiter Login
             </button>
-
             <button
-              onClick={() => openSignIn()}
-              className="bg-blue-600 text-white px-6 sm:px-9 py-2 rounded-full hover:bg-blue-700"
+              onClick={(e) => openSignIn()}
+              className="bg-blue-600 text-white px-6 sm:px-9 py-2 rounded-full"
             >
               Login
             </button>
@@ -123,3 +95,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
