@@ -46,10 +46,10 @@ const ManageJobs = () => {
       )
 
       if (data.success) {
-        toast.success(data.message)
+        toast.success(data.message || 'Visibility changed successfully')
         fetchCompanyJobs()
       } else {
-        toast.error(data.message)
+        toast.error(data.message || 'Failed to change visibility')
       }
 
     } catch (error) {

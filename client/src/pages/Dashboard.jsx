@@ -112,10 +112,17 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (companyData) {
-      navigate("/dashboard/manage-jobs");
+    // Only redirect if we're at the base /dashboard route
+    if (window.location.pathname === '/dashboard') {
+      if (companyToken && companyData) {
+        navigate("/dashboard/manage-jobs", { replace: true });
+      } else if (!companyToken) {
+        // No token, redirect to home
+        navigate("/", { replace: true });
+      }
+      // If token exists but data not loaded yet, wait for it (fetchCompanyData will be called)
     }
-  }, [companyData]);
+  }, [companyToken, companyData, navigate]);
 
   return (
     <div className="min-h-screen">

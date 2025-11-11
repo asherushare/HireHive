@@ -42,9 +42,10 @@ const ViewApplications = () => {
       )
 
       if (data.success) {
+        toast.success(data.message || 'Status updated successfully')
         fetchCompanyJobApplications()
       } else {
-        toast.error(data.message)
+        toast.error(data.message || 'Failed to update status')
       }
 
     } catch (error) {

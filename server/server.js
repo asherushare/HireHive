@@ -81,12 +81,10 @@ const initializeConnections = async () => {
 // Middlewares
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "*", // Allow requests from frontend
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Allow requests from frontend
     credentials: true,
   })
 );
-app.use(express.json({ limit: "10mb" })); // Increase limit for file uploads
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Initialize connections on first request (serverless-friendly)
 // This must be before routes so connections are ready when routes execute
@@ -102,9 +100,35 @@ app.use(async (req, res, next) => {
   }
 });
 
+// Webhook route - MUST be before JSON body parser
+// Webhooks need raw body for signature verification
+app.post(
+  "/webhooks",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    try {
+      // Parse the raw body for webhook verification
+      const rawBody = req.body.toString();
+      req.body = JSON.parse(rawBody);
+      // Store raw body for verification
+      req.rawBody = rawBody;
+      await clerkWebhooks(req, res);
+    } catch (error) {
+      console.error("Webhook parsing error:", error);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid webhook payload" });
+    }
+  }
+);
+
+// Body parsers - AFTER webhook route
+app.use(express.json({ limit: "10mb" })); // Increase limit for file uploads
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 // Public routes (no authentication required)
 app.get("/", (req, res) => res.send("API is running..."));
-app.get("debug-sentry", function mainHandler(req, res) {
+app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
 
@@ -123,14 +147,11 @@ app.get("/api/health", (req, res) => {
           : "missing",
       clerk: process.env.CLERK_SECRET_KEY ? "configured" : "missing",
       webhook: process.env.CLERK_WEBHOOK_SECRET ? "configured" : "missing",
+      jwt: process.env.JWT_SECRET ? "configured" : "missing",
     },
     environment: process.env.NODE_ENV || "development",
   });
 });
-
-// Webhook route - MUST be before clerkMiddleware
-// Webhooks have their own authentication via CLERK_WEBHOOK_SECRET
-app.post("/webhooks", clerkWebhooks);
 
 // Public API routes (no authentication required)
 // Jobs should be publicly accessible

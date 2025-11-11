@@ -6,7 +6,11 @@ import { v2 as cloudinary } from "cloudinary"
 // Get User Data
 export const getUserData = async (req, res) => {
 
-    const userId = req.auth.userId
+    const userId = req.auth?.userId
+
+    if (!userId) {
+        return res.status(401).json({ success: false, message: 'User not authenticated' })
+    }
 
     try {
 
@@ -30,13 +34,21 @@ export const applyForJob = async (req, res) => {
 
     const { jobId } = req.body
 
-    const userId = req.auth.userId
+    if (!jobId) {
+        return res.json({ success: false, message: 'Job ID is required' })
+    }
+
+    const userId = req.auth?.userId
+
+    if (!userId) {
+        return res.status(401).json({ success: false, message: 'User not authenticated' })
+    }
 
     try {
 
-        const isAlreadyApplied = await JobApplication.find({ jobId, userId })
+        const isAlreadyApplied = await JobApplication.findOne({ jobId, userId })
 
-        if (isAlreadyApplied.length > 0) {
+        if (isAlreadyApplied) {
             return res.json({ success: false, message: 'Already Applied' })
         }
 
@@ -66,18 +78,19 @@ export const getUserJobApplications = async (req, res) => {
 
     try {
 
-        const userId = req.auth.userId
+        const userId = req.auth?.userId
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: 'User not authenticated' })
+        }
 
         const applications = await JobApplication.find({ userId })
             .populate('companyId', 'name email image')
             .populate('jobId', 'title description location category level salary')
             .exec()
 
-        if (!applications) {
-            return res.json({ success: false, message: 'No job applications found for this user.' })
-        }
-
-        return res.json({ success: true, applications })
+        // Return empty array instead of error if no applications
+        return res.json({ success: true, applications: applications || [] })
 
     } catch (error) {
         res.json({ success: false, message: error.message })
@@ -89,17 +102,32 @@ export const getUserJobApplications = async (req, res) => {
 export const updateUserResume = async (req, res) => {
     try {
 
-        const userId = req.auth.userId
+        const userId = req.auth?.userId
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: 'User not authenticated' })
+        }
 
         const resumeFile = req.file
 
-        const userData = await User.findById(userId)
-
-        if (resumeFile) {
-            const resumeUpload = await cloudinary.uploader.upload(resumeFile.path)
-            userData.resume = resumeUpload.secure_url
+        if (!resumeFile) {
+            return res.json({ success: false, message: 'No resume file provided' })
         }
 
+        const userData = await User.findById(userId)
+
+        if (!userData) {
+            return res.json({ success: false, message: 'User not found' })
+        }
+
+        // ✅ Upload from memory buffer (Vercel-safe)
+        const base64 = `data:${resumeFile.mimetype};base64,${resumeFile.buffer.toString("base64")}`;
+        const resumeUpload = await cloudinary.uploader.upload(base64, {
+            resource_type: 'auto',
+            folder: 'resumes'
+        })
+        
+        userData.resume = resumeUpload.secure_url
         await userData.save()
 
         return res.json({ success: true, message: 'Resume Updated' })

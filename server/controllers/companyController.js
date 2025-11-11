@@ -385,7 +385,19 @@ export const ChangeJobApplicationsStatus = async (req, res) => {
   try {
     const { id, status } = req.body;
 
-    await JobApplication.findOneAndUpdate({ _id: id }, { status });
+    if (!id || !status) {
+      return res.json({ success: false, message: 'Application ID and status are required' });
+    }
+
+    const application = await JobApplication.findOneAndUpdate(
+      { _id: id, companyId: req.company._id },
+      { status },
+      { new: true }
+    );
+
+    if (!application) {
+      return res.json({ success: false, message: 'Application not found or unauthorized' });
+    }
 
     res.json({ success: true, message: "Status Changed" });
   } catch (error) {
@@ -397,17 +409,27 @@ export const ChangeJobApplicationsStatus = async (req, res) => {
 export const changeVisiblity = async (req, res) => {
   try {
     const { id } = req.body;
+    
+    if (!id) {
+      return res.json({ success: false, message: 'Job ID is required' });
+    }
+
     const companyId = req.company._id;
 
     const job = await Job.findById(id);
 
-    if (companyId.toString() === job.companyId.toString()) {
-      job.visible = !job.visible;
+    if (!job) {
+      return res.json({ success: false, message: 'Job not found' });
     }
 
+    if (companyId.toString() !== job.companyId.toString()) {
+      return res.json({ success: false, message: 'Unauthorized to modify this job' });
+    }
+
+    job.visible = !job.visible;
     await job.save();
 
-    res.json({ success: true, job });
+    res.json({ success: true, job, message: 'Visibility changed successfully' });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

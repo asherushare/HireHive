@@ -31,12 +31,17 @@ const AddJob = () => {
             )
 
             if (data.success) {
-                toast.success(data.message)
+                toast.success('Job posted successfully!')
                 setTitle('')
                 setSalary(0)
-                quillRef.current.root.innerHTML = ""
+                setLocation('Bangalore')
+                setCategory('Programming')
+                setLevel('Beginner level')
+                if (quillRef.current) {
+                    quillRef.current.root.innerHTML = ""
+                }
             } else {
-                toast.error(data.message)
+                toast.error(data.message || 'Failed to post job')
             }
 
         } catch (error) {

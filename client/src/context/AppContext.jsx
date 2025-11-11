@@ -161,8 +161,8 @@ import { useAuth, useUser } from "@clerk/clerk-react";
 export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
-  // ✅ HARD CODED CORRECT BACKEND URL
-  const backendUrl = "https://hire-hive-backend-final.vercel.app";
+  // Backend URL - use environment variable with fallback
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://hire-hive-backend-final.vercel.app";
 
   const { user } = useUser();
   const { getToken } = useAuth();
