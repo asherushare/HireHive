@@ -116,9 +116,9 @@ app.get("/api/health", (req, res) => {
     services: {
       mongodb: process.env.MONGODB_URI ? "configured" : "missing",
       cloudinary:
-        process.env.CLOUDINARY_NAME &&
+        (process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME) &&
         process.env.CLOUDINARY_API_KEY &&
-        process.env.CLOUDINARY_SECRET_KEY
+        (process.env.CLOUDINARY_SECRET_KEY || process.env.CLOUDINARY_API_SECRET)
           ? "configured"
           : "missing",
       clerk: process.env.CLERK_SECRET_KEY ? "configured" : "missing",
@@ -140,26 +140,34 @@ app.use("/api/company", companyRoutes);
 
 // Clerk middleware - requires CLERK_SECRET_KEY environment variable
 // This validates JWT tokens from Clerk for all routes below
-if (!process.env.CLERK_SECRET_KEY) {
+// Only apply if CLERK_SECRET_KEY is set to avoid crashes
+if (process.env.CLERK_SECRET_KEY) {
+  console.log("✅ Clerk middleware configured");
+  app.use(
+    clerkMiddleware({
+      secretKey: process.env.CLERK_SECRET_KEY,
+    })
+  );
+} else {
   console.warn(
     "⚠️  WARNING: CLERK_SECRET_KEY is not set. User authentication will fail!"
   );
-} else {
-  console.log("✅ Clerk middleware configured");
 }
-app.use(
-  clerkMiddleware({
-    secretKey: process.env.CLERK_SECRET_KEY,
-  })
-);
 
 // Protected API routes (require Clerk authentication)
 // User routes require authentication
 app.use("/api/users", userRoutes);
 // Some company routes are protected (already handled by protectCompany middleware in routes)
 
-// Error handling
-Sentry.setupExpressErrorHandler(app);
+// Error handling - only setup if Sentry is properly initialized
+try {
+  if (process.env.SENTRY_DSN) {
+    Sentry.setupExpressErrorHandler(app);
+    console.log("✅ Sentry error handler configured");
+  }
+} catch (error) {
+  console.warn("⚠️  Sentry error handler setup failed:", error.message);
+}
 
 // Export app for Vercel serverless (required - must be at top level)
 export default app;
